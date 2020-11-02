@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Octothorp.Gateway", "Octothorp.Gateway\Octothorp.Gateway.csproj", "{64306DB7-BA92-45EF-8111-71819AABC779}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{64306DB7-BA92-45EF-8111-71819AABC779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64306DB7-BA92-45EF-8111-71819AABC779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64306DB7-BA92-45EF-8111-71819AABC779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64306DB7-BA92-45EF-8111-71819AABC779}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BACA199D-6A4F-41ED-98B4-5CEC462CC496}
+	EndGlobalSection
+EndGlobal
