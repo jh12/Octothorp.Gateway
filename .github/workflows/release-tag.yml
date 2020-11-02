@@ -1,0 +1,25 @@
+name: Release Tag
+on:
+  push:
+    branches: 
+      - alpha
+      - master
+
+jobs:
+  tag:
+    name: Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.RELEASE_PAT }}
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PAT }}
+        run: npx semantic-release 

@@ -1,0 +1,32 @@
+name: Release
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.301
+      - name: Get version tag
+        id: previoustag
+        uses: WyriHaximus/github-action-get-previous-tag@master
+      # Master branch
+      - name: Docker master publish
+        if: github.event.base_ref == 'refs/heads/master'
+        run: |
+          SEMVER=${{ steps.previoustag.outputs.tag }}
+          RELEASE_VERSION="${SEMVER:1}"
+          docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.CONTAINER_REGISTRY_PAT }}
+          docker build --build-arg RELEASE_VERSION=$RELEASE_VERSION -f Octothorp.Gateway/Dockerfile -t ghcr.io/jh12/octothorp.gateway/octothorp.gateway:latest -t ghcr.io/jh12/octothorp.gateway/octothorp.gateway:$RELEASE_VERSION .
+          docker push ghcr.io/jh12/octothorp.gateway/octothorp.gateway
+          docker logout ghcr.io
