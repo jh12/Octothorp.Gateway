@@ -3,7 +3,7 @@ on:
   push:
     branches: 
       - alpha
-      - master
+      - main
 
 jobs:
   tag:

@@ -20,9 +20,9 @@ jobs:
       - name: Get version tag
         id: previoustag
         uses: WyriHaximus/github-action-get-previous-tag@master
-      # Master branch
-      - name: Docker master publish
-        if: github.event.base_ref == 'refs/heads/master'
+      # Main branch
+      - name: Docker main publish
+        if: github.event.base_ref == 'refs/heads/main'
         run: |
           SEMVER=${{ steps.previoustag.outputs.tag }}
           RELEASE_VERSION="${SEMVER:1}"
