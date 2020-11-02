@@ -2,6 +2,7 @@ using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -10,15 +11,22 @@ namespace Octothorp.Gateway
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _hostEnvironment;
 
-        public Startup(IWebHostEnvironment hostEnvironment)
+        public Startup(IConfiguration configuration, IWebHostEnvironment hostEnvironment)
         {
+            _configuration = configuration;
             _hostEnvironment = hostEnvironment;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddReverseProxy()
+                .LoadFromConfig(_configuration.GetSection("ReverseProxy"));
+
+            if(_hostEnvironment.IsProduction())
+                services.AddLettuceEncrypt();
         }
 
         public void ConfigureContainer(ContainerBuilder containerBuilder)
@@ -39,9 +47,11 @@ namespace Octothorp.Gateway
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapReverseProxy();
+
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync("Hello World!");
+                    await context.Response.WriteAsync("Hello there!");
                 });
             });
         }

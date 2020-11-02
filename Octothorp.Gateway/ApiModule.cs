@@ -1,7 +1,5 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -31,10 +29,8 @@ namespace Octothorp.Gateway
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext();
 
-            if (_hostEnvironment.IsDevelopment())
-                configuration.WriteTo.Console();
-            else
-                throw new NotImplementedException();
+            // TODO: Add production logger sink
+            configuration.WriteTo.Console();
 
             Logger logger = configuration.CreateLogger();
             Log.Logger = logger;
