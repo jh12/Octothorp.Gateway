@@ -26,7 +26,14 @@ namespace Octothorp.Gateway
                 .LoadFromConfig(_configuration.GetSection("ReverseProxy"));
 
             if(_hostEnvironment.IsProduction())
-                services.AddLettuceEncrypt();
+            {
+                services.AddLettuceEncrypt(c =>
+                {
+                    bool.TryParse(_configuration["LettuceEncrypt:UseStagingServer"], out bool useStagingServer);
+
+                    c.UseStagingServer = useStagingServer;
+                });
+            }
         }
 
         public void ConfigureContainer(ContainerBuilder containerBuilder)
