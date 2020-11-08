@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Octothorp.Gateway", "Octothorp.Gateway\Octothorp.Gateway.csproj", "{64306DB7-BA92-45EF-8111-71819AABC779}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octothorp.Gateway", "Octothorp.Gateway\Octothorp.Gateway.csproj", "{64306DB7-BA92-45EF-8111-71819AABC779}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Octothorp.Gateway.DTOs", "Octothorp.Gateway.DTOs\Octothorp.Gateway.DTOs.csproj", "{30481F0F-3423-43E6-AABD-24327B458DF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{64306DB7-BA92-45EF-8111-71819AABC779}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64306DB7-BA92-45EF-8111-71819AABC779}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64306DB7-BA92-45EF-8111-71819AABC779}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30481F0F-3423-43E6-AABD-24327B458DF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30481F0F-3423-43E6-AABD-24327B458DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30481F0F-3423-43E6-AABD-24327B458DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30481F0F-3423-43E6-AABD-24327B458DF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

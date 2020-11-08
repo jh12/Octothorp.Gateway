@@ -7,10 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.Discord" Version="3.1.6" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
     <PackageReference Include="LettuceEncrypt" Version="1.0.0" />
     <PackageReference Include="Microsoft.ReverseProxy" Version="1.0.0-preview.6.20513.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Octothorp.Gateway.DTOs\Octothorp.Gateway.DTOs.csproj" />
   </ItemGroup>
 
 </Project>
