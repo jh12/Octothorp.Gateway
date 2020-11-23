@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Octothorp.Gateway.DTOs.V1.Auth;
+using Octothorp.Gateway.Shared.Exceptions.Auth;
 
 namespace Octothorp.Gateway.Controllers
 {
@@ -53,13 +54,6 @@ namespace Octothorp.Gateway.Controllers
             return Challenge(new AuthenticationProperties {RedirectUri = "/"}, scheme.Name);
         }
 
-        [Route("callback/{provider}")]
-        [AllowAnonymous]
-        public async Task<IActionResult> SigninCalback()
-        {
-            return Ok();
-        }
-
         [HttpGet("signout")]
         [HttpPost("signout")]
         public async Task<IActionResult> Signout()
@@ -74,7 +68,7 @@ namespace Octothorp.Gateway.Controllers
             ClaimsPrincipal httpContextUser = HttpContext.User;
 
             if(!httpContextUser.Identity.IsAuthenticated)
-                return Forbid();
+                throw new NotSignedInException();
 
             string? username = httpContextUser.Identity.Name;
 

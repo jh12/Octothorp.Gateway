@@ -1,14 +1,12 @@
-using System.Net;
-using System.Security.Principal;
-using System.Threading.Tasks;
 using Autofac;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Octothorp.Gateway.Events.Auth;
+using Octothorp.Gateway.Middleware;
 using Serilog;
 
 namespace Octothorp.Gateway
@@ -46,17 +44,7 @@ namespace Octothorp.Gateway
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/signin";
-                    // Do not redirect to signin page when calling api
-                    options.Events.OnRedirectToAccessDenied = context =>
-                    {
-                        if (context.Request.Path.StartsWithSegments("/api"))
-                        {
-                            context.Response.StatusCode = (int) HttpStatusCode.Forbidden;
-                            return Task.CompletedTask;
-                        }
-
-                        return context.Options.Events.OnRedirectToAccessDenied(context);
-                    };
+                    options.EventsType = typeof(CookieAuthEvents);
                 })
                 .AddDiscord(options =>
                 {
@@ -67,7 +55,15 @@ namespace Octothorp.Gateway
 
             services.AddAuthorization();
 
-            services.AddControllers();
+            services
+                .AddControllers(options =>
+                {
+                    options.Filters.Add<ExceptionHandlingMiddleware>();
+                })
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.WriteIndented = true;
+                });
         }
 
         public void ConfigureContainer(ContainerBuilder containerBuilder)
@@ -91,6 +87,7 @@ namespace Octothorp.Gateway
             app.UseAuthentication();
 
             app.UseRouting();
+            app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.UseAuthorization();
@@ -100,16 +97,6 @@ namespace Octothorp.Gateway
                 endpoints.MapReverseProxy();
 
                 endpoints.MapControllers();
-
-                endpoints.MapGet("/", async context =>
-                {
-                    IIdentity identity = context.User.Identity;
-
-                    if (identity.IsAuthenticated)
-                        await context.Response.WriteAsync($"Hello {identity.Name}!");
-                    else
-                        await context.Response.WriteAsync("Hello there stranger!");
-                });
             });
         }
     }

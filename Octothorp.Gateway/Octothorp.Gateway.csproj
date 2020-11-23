@@ -15,7 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Octothorp.Gateway.DataAccess\Octothorp.Gateway.DataAccess.csproj" />
     <ProjectReference Include="..\Octothorp.Gateway.DTOs\Octothorp.Gateway.DTOs.csproj" />
+    <ProjectReference Include="..\Octothorp.Gateway.Shared\Octothorp.Gateway.Shared.csproj" />
   </ItemGroup>
 
 </Project>
