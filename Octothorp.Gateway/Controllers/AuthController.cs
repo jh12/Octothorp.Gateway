@@ -51,14 +51,14 @@ namespace Octothorp.Gateway.Controllers
             if (scheme == null)
                 return BadRequest();
 
-            return Challenge(new AuthenticationProperties {RedirectUri = "/"}, scheme.Name);
+            return Challenge(new AuthenticationProperties {RedirectUri = "/user"}, scheme.Name);
         }
 
         [HttpGet("signout")]
         [HttpPost("signout")]
         public async Task<IActionResult> Signout()
         {
-            return SignOut(new AuthenticationProperties {RedirectUri = "/"}, CookieAuthenticationDefaults.AuthenticationScheme);
+            return SignOut(new AuthenticationProperties {RedirectUri = "/user"}, CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
         [HttpGet("user/current")]

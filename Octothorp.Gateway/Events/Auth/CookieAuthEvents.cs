@@ -42,5 +42,11 @@ namespace Octothorp.Gateway.Events.Auth
 
             await base.SigningIn(context);
         }
+
+        public override Task SigningOut(CookieSigningOutContext context)
+        {
+            context.Response.Redirect("/User");
+            return Task.CompletedTask;
+        }
     }
 }

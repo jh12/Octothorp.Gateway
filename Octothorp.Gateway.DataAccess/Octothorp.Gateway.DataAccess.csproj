@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.11.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Octothorp.Gateway.DTOs\Octothorp.Gateway.DTOs.csproj" />
     <ProjectReference Include="..\Octothorp.Gateway.Shared\Octothorp.Gateway.Shared.csproj" />
   </ItemGroup>
 
