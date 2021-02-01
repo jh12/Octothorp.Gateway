@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS publish
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster-slim-amd64 AS publish
 ARG RELEASE_VERSION
 WORKDIR /src
 COPY ["Octothorp.Gateway/Octothorp.Gateway.csproj", "Octothorp.Gateway/"]
