@@ -2,6 +2,7 @@ using Autofac;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -39,11 +40,18 @@ namespace Octothorp.Gateway
                 });
             }
 
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
             services
                 .AddAuthentication(options => { options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; })
                 .AddCookie(options =>
                 {
-                    options.LoginPath = "/signin";
                     options.EventsType = typeof(CookieAuthEvents);
                 })
                 .AddDiscord(options =>
@@ -64,6 +72,8 @@ namespace Octothorp.Gateway
                 {
                     options.JsonSerializerOptions.WriteIndented = true;
                 });
+
+            services.AddRazorPages();
         }
 
         public void ConfigureContainer(ContainerBuilder containerBuilder)
@@ -86,17 +96,20 @@ namespace Octothorp.Gateway
 
             app.UseAuthentication();
 
-            app.UseRouting();
-            app.UseDefaultFiles();
-            app.UseStaticFiles();
+            app
+                .UseRouting()
+                .UseStaticFiles();
+            //app.UseDefaultFiles();
+            //app.UseStaticFiles();
 
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapReverseProxy();
-
+                //endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapDefaultControllerRoute();
             });
         }
     }
