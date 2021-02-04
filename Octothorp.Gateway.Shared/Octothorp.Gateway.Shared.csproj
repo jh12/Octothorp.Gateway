@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Octothorp.Gateway.DTOs\Octothorp.Gateway.DTOs.csproj" />
-  </ItemGroup>
-
 </Project>

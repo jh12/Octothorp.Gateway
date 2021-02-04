@@ -3,7 +3,6 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.WebUtilities;
-using Octothorp.Gateway.DTOs.V1.Responses;
 using Octothorp.Gateway.Shared.Exceptions;
 using Serilog;
 
@@ -30,9 +29,7 @@ namespace Octothorp.Gateway.Middleware
             {
                 _logger.Error(context.Exception, "Not implemented exception was thrown");
 
-                ErrorResponse response = new ErrorResponse(HttpStatusCode.NotImplemented, ReasonPhrases.GetReasonPhrase((int) HttpStatusCode.NotImplemented), notImplemented.Message);
-
-                context.Result = new ObjectResult(response)
+                context.Result = new ObjectResult(notImplemented.Message)
                 {
                     StatusCode = (int?) HttpStatusCode.NotImplemented
                 };
@@ -42,9 +39,7 @@ namespace Octothorp.Gateway.Middleware
             {
                 _logger.Error(context.Exception, "An unhandled exception was thrown");
 
-                ErrorResponse response = new ErrorResponse(httpResponse.Status, ReasonPhrases.GetReasonPhrase((int) httpResponse.Status), httpResponse.Value);
-
-                context.Result = new ObjectResult(response)
+                context.Result = new ObjectResult(httpResponse.Value)
                 {
                     StatusCode = (int?) httpResponse.Status
                 };

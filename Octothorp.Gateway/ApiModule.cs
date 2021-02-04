@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Microsoft.AspNetCore.Hosting;
-using Octothorp.Gateway.Events.Auth;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -19,10 +18,6 @@ namespace Octothorp.Gateway
         protected override void Load(ContainerBuilder builder)
         {
             RegisterLogger(builder);
-
-            builder.RegisterType<CookieAuthEvents>();
-
-            builder.RegisterModule<DataAccessModule>();
         }
 
         private void RegisterLogger(ContainerBuilder builder)

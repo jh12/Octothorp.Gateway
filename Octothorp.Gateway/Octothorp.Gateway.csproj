@@ -9,15 +9,17 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="3.1.6" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
-    <PackageReference Include="LettuceEncrypt" Version="1.0.0" />
-    <PackageReference Include="Microsoft.ReverseProxy" Version="1.0.0-preview.6.20513.1" />
+    <PackageReference Include="LettuceEncrypt" Version="1.0.1" />
+    <PackageReference Include="Microsoft.ReverseProxy" Version="1.0.0-preview.8.21065.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Octothorp.Gateway.DataAccess\Octothorp.Gateway.DataAccess.csproj" />
-    <ProjectReference Include="..\Octothorp.Gateway.DTOs\Octothorp.Gateway.DTOs.csproj" />
     <ProjectReference Include="..\Octothorp.Gateway.Shared\Octothorp.Gateway.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

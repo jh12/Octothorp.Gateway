@@ -1,12 +1,10 @@
 using Autofac;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Octothorp.Gateway.Events.Auth;
 using Octothorp.Gateway.Middleware;
 using Serilog;
 
@@ -49,21 +47,6 @@ namespace Octothorp.Gateway
             });
 
             services
-                .AddAuthentication(options => { options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme; })
-                .AddCookie(options =>
-                {
-                    options.EventsType = typeof(CookieAuthEvents);
-                })
-                .AddDiscord(options =>
-                {
-                    options.ClientId = _configuration["Auth:Discord:ClientId"];
-                    options.ClientSecret = _configuration["Auth:Discord:ClientSecret"];
-                    options.CallbackPath = _configuration["Auth:Discord:CallbackPath"];
-                });
-
-            services.AddAuthorization();
-
-            services
                 .AddControllers(options =>
                 {
                     options.Filters.Add<ExceptionHandlingMiddleware>();
@@ -94,22 +77,12 @@ namespace Octothorp.Gateway
 
             app.UseSerilogRequestLogging();
 
-            app.UseAuthentication();
-
-            app
-                .UseRouting()
-                .UseStaticFiles();
-            //app.UseDefaultFiles();
-            //app.UseStaticFiles();
-
-            app.UseAuthorization();
+            app.UseRouting();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapReverseProxy();
-                //endpoints.MapRazorPages();
                 endpoints.MapControllers();
-                endpoints.MapDefaultControllerRoute();
             });
         }
     }
