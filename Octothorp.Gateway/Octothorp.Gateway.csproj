@@ -17,8 +17,4 @@
     <ProjectReference Include="..\Octothorp.Gateway.Shared\Octothorp.Gateway.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
