@@ -1,10 +1,13 @@
 using Autofac;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Octothorp.Gateway.Authorization.Handlers;
+using Octothorp.Gateway.Authorization.Requirements;
 using Octothorp.Gateway.Middleware;
 using Serilog;
 
@@ -56,7 +59,17 @@ namespace Octothorp.Gateway
                     options.JsonSerializerOptions.WriteIndented = true;
                 });
 
+            services.AddHttpContextAccessor();
+
             services.AddRazorPages();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("LocalMachine", policy => policy.Requirements.Add(new ZoneRequirement(ZoneRequirement.ZoneArea.LocalMachine)));
+                options.AddPolicy("LocalNetwork", policy => policy.Requirements.Add(new ZoneRequirement(ZoneRequirement.ZoneArea.LocalNetwork)));
+            });
+
+            services.AddSingleton<IAuthorizationHandler, ZoneHandler>();
         }
 
         public void ConfigureContainer(ContainerBuilder containerBuilder)
@@ -78,6 +91,8 @@ namespace Octothorp.Gateway
             app.UseSerilogRequestLogging();
 
             app.UseRouting();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
