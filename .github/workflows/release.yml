@@ -31,7 +31,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.301
+          dotnet-version: 5.0.102
       # Semantic release
       - name: Get version tag
         id: previoustag
@@ -44,7 +44,6 @@ jobs:
           RELEASE_VERSION="${SEMVER:1}"
           echo ::set-output name=RELEASE_VERSION::${RELEASE_VERSION}
       # Login, build & publish docker image
-      # Main branch
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
