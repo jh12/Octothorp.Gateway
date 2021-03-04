@@ -1,15 +1,24 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using NetTools;
 using Octothorp.Gateway.Authorization.Requirements;
 
 namespace Octothorp.Gateway.Authorization.Handlers
 {
     public class ZoneHandler : AuthorizationHandler<ZoneRequirement>
     {
+        private readonly List<IPAddressRange> _internalAddressRanges = new()
+        {
+            IPAddressRange.Parse("10.0.0.0/8"),
+            IPAddressRange.Parse("172.16.0.0/12"),
+            IPAddressRange.Parse("192.168.0.0/16"),
+            IPAddressRange.Parse("fc00::/7")
+        };
+
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public ZoneHandler(IHttpContextAccessor httpContextAccessor)
@@ -34,7 +43,7 @@ namespace Octothorp.Gateway.Authorization.Handlers
 
             if (requirement.Zone <= ZoneRequirement.ZoneArea.LocalNetwork && remoteIpAddress != null)
             {
-                if (IsPrivateAddress(remoteIpAddress))
+                if (_internalAddressRanges.Any(r => r.Contains(remoteIpAddress)))
                 {
                     context.Succeed(requirement);
                     return;
@@ -48,35 +57,6 @@ namespace Octothorp.Gateway.Authorization.Handlers
             }
 
             context.Fail();
-        }
-
-        private bool IsPrivateAddress(IPAddress ipAddress)
-        {
-            IPAddress? ipV4Address = ipAddress.AddressFamily switch
-            {
-                AddressFamily.InterNetwork => ipAddress,
-                AddressFamily.InterNetworkV6 => ipAddress.MapToIPv4(),
-                _ => null
-            };
-
-            if (ipV4Address == null)
-                throw new NotImplementedException($"No support for address family {ipAddress.AddressFamily}");
-
-            byte[] addressBytes = ipV4Address.GetAddressBytes();
-
-            // 10.0.0.0 – 10.255.255.255
-            if (addressBytes[0] == 10)
-                return true;
-
-            // 172.16.0.0 – 172.31.255.255
-            if (addressBytes[0] == 192 && addressBytes[1] == 168)
-                return true;
-
-            // 192.168.0.0 – 192.168.255.255
-            if (addressBytes[0] == 192 && addressBytes[1] == 168)
-                return true;
-
-            return false;
         }
     }
 }

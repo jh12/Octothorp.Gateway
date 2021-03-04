@@ -84,7 +84,8 @@ namespace Octothorp.Gateway
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
+            app.UseStatusCodePages();
 
             app.UseForwardedHeaders();
 
