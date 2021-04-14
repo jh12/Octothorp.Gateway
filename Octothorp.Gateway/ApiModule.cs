@@ -25,8 +25,16 @@ namespace Octothorp.Gateway
             LoggerConfiguration configuration = new LoggerConfiguration();
 
             configuration
+                .Enrich.WithUserName()
+                .Enrich.WithMachineName()
+                .Enrich.WithAssemblyName()
+                .Enrich.WithAssemblyVersion()
+                .Enrich.FromLogContext();
+
+            configuration
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
                 .Enrich.FromLogContext();
 
             // TODO: Add production logger sink
