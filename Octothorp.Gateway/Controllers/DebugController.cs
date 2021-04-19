@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Octothorp.Gateway.Controllers
@@ -11,13 +10,6 @@ namespace Octothorp.Gateway.Controllers
     [Route("debug")]
     public class DebugController : ControllerBase
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public DebugController(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
         [HttpGet("version")]
         public async Task<string> GetVersion()
         {
@@ -31,11 +23,27 @@ namespace Octothorp.Gateway.Controllers
         {
             StringBuilder infoBuilder = new StringBuilder();
             
+            // Server info
+            infoBuilder.AppendLine("==== Server ====");
+            infoBuilder.AppendFormat("Host: {0}", Request.Host);
+            infoBuilder.AppendLine();
+            infoBuilder.AppendLine();
+
             // Client IP
-            HttpContext httpContext = _httpContextAccessor.HttpContext!;
-            IPAddress? remoteIpAddress = httpContext.Connection.RemoteIpAddress;
+            infoBuilder.AppendLine("==== Client ====");
+            IPAddress? remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
 
             infoBuilder.AppendFormat("Client IP: {0}", remoteIpAddress);
+            infoBuilder.AppendLine();
+            infoBuilder.AppendLine();
+
+            // Headers
+            infoBuilder.AppendLine("==== Headers ====");
+            foreach (var (key, value) in Request.Headers)
+            {
+                infoBuilder.AppendFormat("{0}: {1}", key, value);
+                infoBuilder.AppendLine();
+            }
 
             return Task.FromResult(infoBuilder.ToString());
         }
