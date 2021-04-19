@@ -44,6 +44,9 @@ namespace Octothorp.Gateway
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
             });
 
             services
@@ -76,7 +79,11 @@ namespace Octothorp.Gateway
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseForwardedHeaders();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+                ForwardLimit = 2
+            });
 
             if (env.IsDevelopment())
             {
