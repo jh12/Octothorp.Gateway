@@ -1,4 +1,7 @@
+using System.Net;
+using System.Threading.Tasks;
 using Autofac;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,10 +9,12 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Octothorp.Gateway.Auth.Cookie;
 using Octothorp.Gateway.Authorization.Handlers;
 using Octothorp.Gateway.Authorization.Requirements;
 using Octothorp.Gateway.Middleware;
 using Serilog;
+using Yarp.ReverseProxy.Abstractions.Config;
 
 namespace Octothorp.Gateway
 {
@@ -41,14 +46,6 @@ namespace Octothorp.Gateway
                 });
             }
 
-            services.Configure<ForwardedHeadersOptions>(options =>
-            {
-                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-
-                options.KnownNetworks.Clear();
-                options.KnownProxies.Clear();
-            });
-
             services
                 .AddControllers(options =>
                 {
@@ -62,6 +59,13 @@ namespace Octothorp.Gateway
             services.AddHttpContextAccessor();
 
             services.AddRazorPages();
+
+            // Auth
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(c =>
+                {
+                    c.Events = new OctoCookieAuthenticationEvents();
+                });
 
             services.AddAuthorization(options =>
             {
@@ -79,12 +83,6 @@ namespace Octothorp.Gateway
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-                ForwardLimit = 2
-            });
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -94,14 +92,19 @@ namespace Octothorp.Gateway
                 app.UseHttpsRedirection();
             }
 
-            app.UseStatusCodePages();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+                ForwardLimit = 2
+            });
 
-            app.UseForwardedHeaders();
+            app.UseStatusCodePages();
 
             app.UseSerilogRequestLogging();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

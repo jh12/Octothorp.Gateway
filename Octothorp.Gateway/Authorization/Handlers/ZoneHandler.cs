@@ -32,7 +32,7 @@ namespace Octothorp.Gateway.Authorization.Handlers
             IPAddress? remoteIpAddress = httpContext.Connection.RemoteIpAddress;
             IPAddress? localIpAddress = httpContext.Connection.LocalIpAddress;
 
-            if (requirement.Zone <= ZoneRequirement.ZoneArea.LocalMachine)
+            if (requirement.Zone >= ZoneRequirement.ZoneArea.LocalMachine)
             {
                 if (Equals(remoteIpAddress, localIpAddress))
                 {
@@ -41,16 +41,19 @@ namespace Octothorp.Gateway.Authorization.Handlers
                 }
             }
 
-            if (requirement.Zone <= ZoneRequirement.ZoneArea.LocalNetwork && remoteIpAddress != null)
+            if (requirement.Zone >= ZoneRequirement.ZoneArea.LocalNetwork && remoteIpAddress != null)
             {
-                if (_internalAddressRanges.Any(r => r.Contains(remoteIpAddress)))
+                IPAddress remoteIpV4 = remoteIpAddress.MapToIPv4();
+
+                if (_internalAddressRanges.Any(r => r.Contains(remoteIpAddress)) ||
+                    _internalAddressRanges.Any(r => r.Contains(remoteIpV4)))
                 {
                     context.Succeed(requirement);
                     return;
                 }
             }
 
-            if (requirement.Zone <= ZoneRequirement.ZoneArea.External)
+            if (requirement.Zone >= ZoneRequirement.ZoneArea.External)
             {
                 context.Succeed(requirement);
                 return;
