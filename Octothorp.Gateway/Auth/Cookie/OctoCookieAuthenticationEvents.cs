@@ -9,16 +9,21 @@ namespace Octothorp.Gateway.Auth.Cookie
     {
         public override Task RedirectToLogin(RedirectContext<CookieAuthenticationOptions> context)
         {
-            if (context.Request.Path.StartsWithSegments("/api"))
-            {
-                context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
-            }
-            else
-            {
-                context.Response.Redirect(context.RedirectUri);
-            }
+            context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
 
             return Task.CompletedTask;
+
+            // TODO: Use when login pages are implemented
+            //if (context.Request.Path.StartsWithSegments("/api"))
+            //{
+            //    context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
+            //}
+            //else
+            //{
+            //    context.Response.Redirect(context.RedirectUri);
+            //}
+
+            //return Task.CompletedTask;
         }
     }
 }
