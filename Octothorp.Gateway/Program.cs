@@ -31,12 +31,19 @@ namespace Octothorp.Gateway
 
                     builder
                         .AddEnvironmentVariables()
+                        .AddJsonFile("lettuceencrypt", optional: true, reloadOnChange: true)
+                        .AddJsonFile("yarp", optional: true, reloadOnChange: true)
                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                         .AddJsonFile($"appsettings.{env.EnvironmentName}", optional: true, reloadOnChange: true);
                 }))
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder
+                        .UseStartup<Startup>()
+                        .UseKestrel(options =>
+                        {
+                            options.Limits.MaxRequestBodySize = null;
+                        });
                 });
     }
 }
