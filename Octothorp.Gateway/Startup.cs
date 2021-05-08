@@ -1,6 +1,7 @@
-using System.Net;
-using System.Threading.Tasks;
+using System;
+using System.IO;
 using Autofac;
+using LettuceEncrypt;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -14,7 +15,6 @@ using Octothorp.Gateway.Authorization.Handlers;
 using Octothorp.Gateway.Authorization.Requirements;
 using Octothorp.Gateway.Middleware;
 using Serilog;
-using Yarp.ReverseProxy.Abstractions.Config;
 
 namespace Octothorp.Gateway
 {
@@ -38,12 +38,20 @@ namespace Octothorp.Gateway
             // LettuceEncrypt
             if (_hostEnvironment.IsProduction())
             {
-                services.AddLettuceEncrypt(c =>
-                {
-                    bool.TryParse(_configuration["LettuceEncrypt:UseStagingServer"], out bool useStagingServer);
+                string? contentroot = Environment.GetEnvironmentVariable("contentroot") ?? _hostEnvironment.ContentRootPath;
+                string certificateDirectory = Path.Combine(contentroot, "LettuceEncrypt");
 
-                    c.UseStagingServer = useStagingServer;
-                });
+                if (!Directory.Exists(certificateDirectory))
+                    Directory.CreateDirectory(certificateDirectory);
+
+                services
+                    .AddLettuceEncrypt(c =>
+                    {
+                        bool.TryParse(_configuration["LettuceEncrypt:UseStagingServer"], out bool useStagingServer);
+
+                        c.UseStagingServer = useStagingServer;
+                    })
+                    .PersistDataToDirectory(new DirectoryInfo(certificateDirectory), string.Empty);
             }
 
             services
