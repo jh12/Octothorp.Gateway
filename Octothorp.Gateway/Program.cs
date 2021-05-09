@@ -31,8 +31,8 @@ namespace Octothorp.Gateway
 
                     builder
                         .AddEnvironmentVariables()
-                        .AddJsonFile("lettuceencrypt", optional: true, reloadOnChange: true)
-                        .AddJsonFile("yarp", optional: true, reloadOnChange: true)
+                        .AddJsonFile("lettuceencrypt.json", optional: true, reloadOnChange: true)
+                        .AddJsonFile("proxy.json", optional: true, reloadOnChange: true)
                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                         .AddJsonFile($"appsettings.{env.EnvironmentName}", optional: true, reloadOnChange: true);
                 }))
