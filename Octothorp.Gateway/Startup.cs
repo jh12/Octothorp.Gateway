@@ -86,7 +86,7 @@ namespace Octothorp.Gateway
 
         public void ConfigureContainer(ContainerBuilder containerBuilder)
         {
-            containerBuilder.RegisterModule(new ApiModule(_hostEnvironment));
+            containerBuilder.RegisterModule(new ApiModule(_hostEnvironment, _configuration));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -109,6 +109,7 @@ namespace Octothorp.Gateway
             app.UseStatusCodePages();
 
             app.UseSerilogRequestLogging();
+            app.UseLoggingContext();
 
             app.UseRouting();
 
