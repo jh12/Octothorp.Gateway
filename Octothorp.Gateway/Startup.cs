@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Octothorp.Gateway.Auth.Cookie;
 using Octothorp.Gateway.Authorization.Handlers;
 using Octothorp.Gateway.Authorization.Requirements;
+using Octothorp.Gateway.Logging;
 using Octothorp.Gateway.Middleware;
 using Serilog;
 
@@ -108,7 +109,10 @@ namespace Octothorp.Gateway
 
             app.UseStatusCodePages();
 
-            app.UseSerilogRequestLogging();
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.GetLevel = LogHelper.ExcludeLogging;
+            });
             app.UseLoggingContext();
 
             app.UseRouting();

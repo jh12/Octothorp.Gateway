@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Autofac;
@@ -44,8 +44,8 @@ namespace Octothorp.Gateway
 
             builder
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
                 .Enrich.FromLogContext();
 
             if (_hostEnvironment.IsDevelopment())
