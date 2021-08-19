@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Autofac;
@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Octothorp.Gateway.Middleware;
 using Serilog;
 using Serilog.Core;
-using Serilog.Events;
 using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
 
@@ -36,27 +35,21 @@ namespace Octothorp.Gateway
             LoggerConfiguration builder = new LoggerConfiguration();
 
             builder
+                .ReadFrom
+                .Configuration(_configuration);
+
+            builder
                 .Enrich.WithUserName()
                 .Enrich.WithMachineName()
                 .Enrich.WithAssemblyName()
                 .Enrich.WithAssemblyVersion()
                 .Enrich.FromLogContext();
 
-            builder
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
-                .Enrich.FromLogContext();
-
-            if (_hostEnvironment.IsDevelopment())
-                builder.WriteTo.Console();
-            else
+            if (_hostEnvironment.IsProduction())
             {
-                builder.WriteTo.Console();
-
                 IConfigurationSection lokiSection = _configuration.GetSection("Loki");
 
-                if(lokiSection != null)
+                if (lokiSection != null)
                 {
                     string url = lokiSection["Url"];
 
@@ -72,9 +65,6 @@ namespace Octothorp.Gateway
             Log.Logger = logger;
 
             containerBuilder.Register(f => logger).As<ILogger>().SingleInstance();
-
-            Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
-            Serilog.Debugging.SelfLog.Enable(Console.Error);
         }
 
         private void RegisterMiddleware(ContainerBuilder builder)
@@ -87,7 +77,7 @@ namespace Octothorp.Gateway
     {
         public IList<LokiLabel> GetLabels() => new List<LokiLabel>();
 
-        public IList<string> PropertiesAsLabels => new List<string> {"AssemblyName", "level", "Path"};
+        public IList<string> PropertiesAsLabels => new List<string> { "AssemblyName", "level", "Path" };
         public IList<string> PropertiesToAppend => new List<string>();
         public LokiFormatterStrategy FormatterStrategy => LokiFormatterStrategy.SpecificPropertiesAsLabelsAndRestAppended;
     }
