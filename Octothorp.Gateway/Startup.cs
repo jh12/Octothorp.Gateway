@@ -109,11 +109,8 @@ namespace Octothorp.Gateway
 
             app.UseStatusCodePages();
 
-            app.UseSerilogRequestLogging(options =>
-            {
-                options.GetLevel = LogHelper.ExcludeLogging;
-            });
             app.UseLoggingContext();
+            app.UseSerilogRequestLogging();
 
             app.UseRouting();
 
