@@ -12,6 +12,7 @@ namespace Octothorp.Gateway.Middleware
         {
             IIdentity? identity = context.User.Identity;
 
+            using (LogContext.PushProperty("Host", context.Request.Host.Host))
             using (LogContext.PushProperty("ClientUsername", identity?.Name))
             using (LogContext.PushProperty("IP", context.Connection.RemoteIpAddress))
                 await next(context);
