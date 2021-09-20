@@ -79,6 +79,7 @@ namespace Octothorp.Gateway
             {
                 options.AddPolicy("LocalMachine", policy => policy.Requirements.Add(new ZoneRequirement(ZoneRequirement.ZoneArea.LocalMachine)));
                 options.AddPolicy("LocalNetwork", policy => policy.Requirements.Add(new ZoneRequirement(ZoneRequirement.ZoneArea.LocalNetwork)));
+                options.AddPolicy("External", policy => policy.Requirements.Add(new ZoneRequirement(ZoneRequirement.ZoneArea.External)));
             });
 
             services.AddSingleton<IAuthorizationHandler, ZoneHandler>();
