@@ -44,3 +44,4 @@ namespace Octothorp.Gateway
             return hostBuilder;
         }
     }
+}
