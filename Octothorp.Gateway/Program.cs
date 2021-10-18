@@ -14,28 +14,23 @@ namespace Octothorp.Gateway
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            IHostBuilder hostBuilder = Host.CreateDefaultBuilder(args)
                 .UseSerilog()
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .ConfigureAppConfiguration(((context, builder) =>
+                .ConfigureAppConfiguration((context, builder) =>
                 {
-                    builder.Sources.Clear();
-
-                    IHostEnvironment env = context.HostingEnvironment;
-
                     string? contentRootPath = Environment.GetEnvironmentVariable("contentroot");
 
                     if (!string.IsNullOrEmpty(contentRootPath))
                         builder.SetBasePath(contentRootPath);
 
                     builder
-                        .AddEnvironmentVariables()
-                        .AddJsonFile("lettuceencrypt.json", optional: true, reloadOnChange: true)
-                        .AddJsonFile("proxy.json", optional: true, reloadOnChange: true)
                         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                        .AddJsonFile($"appsettings.{env.EnvironmentName}", optional: true, reloadOnChange: true);
-                }))
+                        .AddJsonFile("lettuceencrypt.json", optional: true, reloadOnChange: true)
+                        .AddJsonFile("proxy.json", optional: true, reloadOnChange: true);
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
@@ -45,5 +40,7 @@ namespace Octothorp.Gateway
                             options.Limits.MaxRequestBodySize = null;
                         });
                 });
+
+            return hostBuilder;
+        }
     }
-}
