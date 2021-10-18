@@ -1,11 +1,9 @@
-using System;
-using System.IO;
 using Autofac;
-using LettuceEncrypt;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,25 +32,6 @@ namespace Octothorp.Gateway
             // Reverse Proxy
             services.AddReverseProxy()
                 .LoadFromConfig(_configuration.GetSection("ReverseProxy"));
-
-            // LettuceEncrypt
-            if (_hostEnvironment.IsProduction())
-            {
-                string? contentroot = Environment.GetEnvironmentVariable("contentroot") ?? _hostEnvironment.ContentRootPath;
-                string certificateDirectory = Path.Combine(contentroot, "LettuceEncrypt");
-
-                if (!Directory.Exists(certificateDirectory))
-                    Directory.CreateDirectory(certificateDirectory);
-
-                services
-                    .AddLettuceEncrypt(c =>
-                    {
-                        bool.TryParse(_configuration["LettuceEncrypt:UseStagingServer"], out bool useStagingServer);
-
-                        c.UseStagingServer = useStagingServer;
-                    })
-                    .PersistDataToDirectory(new DirectoryInfo(certificateDirectory), string.Empty);
-            }
 
             services
                 .AddControllers(options =>
@@ -121,6 +100,13 @@ namespace Octothorp.Gateway
             {
                 endpoints.MapReverseProxy();
                 endpoints.MapControllers();
+                if (!string.IsNullOrEmpty(_configuration["Certificate:ChallengeName"]))
+                {
+                    endpoints.Map($".well-known/acme-challenge/{_configuration["Certificate:ChallengeName"]}", async ContextBoundObject =>
+                    {
+                        await ContextBoundObject.Response.WriteAsync(_configuration["Certificate:ChallengeValue"]);
+                    });
+                }
             });
         }
     }
