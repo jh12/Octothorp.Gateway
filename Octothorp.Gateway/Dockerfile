@@ -1,16 +1,36 @@
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim AS base
+# ====== Production linux-arm ====== #
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim-arm32v7 as base-arm
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS publish
+# ====== Production linux-x64 ====== #
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim-amd64 as linux-x64
+WORKDIR /app
+
+# ====== Build image ====== #
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS publish
 ARG RELEASE_VERSION
 WORKDIR /src
+
 COPY ["Octothorp.Gateway/Octothorp.Gateway.csproj", "Octothorp.Gateway/"]
 RUN dotnet restore "Octothorp.Gateway/Octothorp.Gateway.csproj"
 COPY . .
 WORKDIR "/src/Octothorp.Gateway"
 RUN dotnet publish "Octothorp.Gateway.csproj" -c Release -p:VersionPrefix=$RELEASE_VERSION -o /app/publish
 
-FROM base AS final
+# ====== Copy to final-arm ====== #
+FROM base-arm AS final-arm
+
+RUN addgroup --system --gid 1000 netcoregroup \
+&& adduser --system --uid 1000 --ingroup netcoregroup --shell /bin/sh netcoreuser
+
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+USER 1000
+ENTRYPOINT ["dotnet", "Octothorp.Gateway.dll"]
+
+# ====== Copy to final-x64 ====== #
+FROM base-arm AS final-arm
 
 RUN addgroup --system --gid 1000 netcoregroup \
 && adduser --system --uid 1000 --ingroup netcoregroup --shell /bin/sh netcoreuser
