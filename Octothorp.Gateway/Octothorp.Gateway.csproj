@@ -15,7 +15,7 @@
     <PackageReference Include="Serilog.Enrichers.Context" Version="4.2.0" />
     <PackageReference Include="Serilog.Expressions" Version="3.2.0" />
     <PackageReference Include="Serilog.Sinks.Loki" Version="4.0.0-beta3" />
-    <PackageReference Include="Yarp.ReverseProxy" Version="1.0.0-preview.10.21168.2" />
+    <PackageReference Include="Yarp.ReverseProxy" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
