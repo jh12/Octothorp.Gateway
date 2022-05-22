@@ -7,13 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.1.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="7.2.0" />
     <PackageReference Include="IPAddressRange" Version="4.2.0" />
     <PackageReference Include="LettuceEncrypt" Version="1.0.1" />
-    <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
     <PackageReference Include="Serilog.Enrichers.AssemblyName" Version="1.0.9" />
     <PackageReference Include="Serilog.Enrichers.Context" Version="4.2.0" />
-    <PackageReference Include="Serilog.Expressions" Version="3.2.0" />
+    <PackageReference Include="Serilog.Expressions" Version="3.4.0" />
     <PackageReference Include="Serilog.Sinks.Loki" Version="4.0.0-beta3" />
     <PackageReference Include="Yarp.ReverseProxy" Version="1.1.0" />
   </ItemGroup>
