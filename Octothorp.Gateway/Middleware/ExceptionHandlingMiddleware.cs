@@ -20,7 +20,7 @@ namespace Octothorp.Gateway.Middleware
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            
+
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
@@ -31,7 +31,7 @@ namespace Octothorp.Gateway.Middleware
 
                 context.Result = new ObjectResult(notImplemented.Message)
                 {
-                    StatusCode = (int?) HttpStatusCode.NotImplemented
+                    StatusCode = (int?)HttpStatusCode.NotImplemented
                 };
                 context.ExceptionHandled = true;
             }
@@ -41,11 +41,11 @@ namespace Octothorp.Gateway.Middleware
 
                 context.Result = new ObjectResult(httpResponse.Value)
                 {
-                    StatusCode = (int?) httpResponse.Status
+                    StatusCode = (int?)httpResponse.Status
                 };
                 context.ExceptionHandled = true;
             }
-            else if(context.Exception != null)
+            else if (context.Exception != null)
                 _logger.Error(context.Exception, "An unhandled exception was thrown");
         }
     }
