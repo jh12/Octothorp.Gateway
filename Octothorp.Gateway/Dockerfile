@@ -1,5 +1,5 @@
 # ====== Production linux-arm ====== #
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim-arm32v7 as base-arm
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-bullseye-slim as base-arm
 WORKDIR /app
 
 # ====== Production linux-x64 ====== #
