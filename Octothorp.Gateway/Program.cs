@@ -16,20 +16,14 @@ namespace Octothorp.Gateway
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
+            IConfiguration config = CreateConfig();
+
             IHostBuilder hostBuilder = Host.CreateDefaultBuilder(args)
                 .UseSerilog()
                 .UseServiceProviderFactory(new AutofacServiceProviderFactory())
                 .ConfigureAppConfiguration((context, builder) =>
                 {
-                    string? contentRootPath = Environment.GetEnvironmentVariable("contentroot");
-
-                    if (!string.IsNullOrEmpty(contentRootPath))
-                        builder.SetBasePath(contentRootPath);
-
-                    builder
-                        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                        .AddJsonFile("lettuceencrypt.json", optional: true, reloadOnChange: true)
-                        .AddJsonFile("proxy.json", optional: true, reloadOnChange: true);
+                    builder.AddConfiguration(config);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
@@ -42,6 +36,23 @@ namespace Octothorp.Gateway
                 });
 
             return hostBuilder;
+        }
+
+        private static IConfiguration CreateConfig()
+        {
+            string? contentRootPath = Environment.GetEnvironmentVariable("contentroot");
+
+            ConfigurationBuilder builder = new ConfigurationBuilder();
+
+            if (!string.IsNullOrEmpty(contentRootPath))
+                builder.SetBasePath(contentRootPath);
+
+            builder
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("lettuceencrypt.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("proxy.json", optional: true, reloadOnChange: true);
+
+            return builder.Build();
         }
     }
 }
