@@ -26,7 +26,7 @@ namespace Octothorp.Gateway.Authorization.Handlers
             _httpContextAccessor = httpContextAccessor;
         }
 
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, ZoneRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ZoneRequirement requirement)
         {
             HttpContext httpContext = _httpContextAccessor.HttpContext!;
             IPAddress? remoteIpAddress = httpContext.Connection.RemoteIpAddress;
@@ -37,7 +37,7 @@ namespace Octothorp.Gateway.Authorization.Handlers
                 if (Equals(remoteIpAddress, localIpAddress))
                 {
                     context.Succeed(requirement);
-                    return;
+                    return Task.CompletedTask;
                 }
             }
 
@@ -49,17 +49,18 @@ namespace Octothorp.Gateway.Authorization.Handlers
                     _internalAddressRanges.Any(r => r.Contains(remoteIpV4)))
                 {
                     context.Succeed(requirement);
-                    return;
+                    return Task.CompletedTask;
                 }
             }
 
             if (requirement.Zone >= ZoneRequirement.ZoneArea.External)
             {
                 context.Succeed(requirement);
-                return;
+                return Task.CompletedTask;
             }
 
             context.Fail();
+            return Task.CompletedTask;
         }
     }
 }

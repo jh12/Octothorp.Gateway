@@ -9,7 +9,7 @@ namespace Octothorp.Gateway.Controllers
     public class DebugController : ControllerBase
     {
         [HttpGet("version")]
-        public async Task<string> GetVersion()
+        public string GetVersion()
         {
             string? informationalVersion = Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
 
