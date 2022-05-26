@@ -1,11 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30621.155
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octothorp.Gateway", "Octothorp.Gateway\Octothorp.Gateway.csproj", "{64306DB7-BA92-45EF-8111-71819AABC779}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Octothorp.Gateway.Shared", "Octothorp.Gateway.Shared\Octothorp.Gateway.Shared.csproj", "{154EEE18-15DB-4239-82DE-9442B30751AE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{299A025E-0B26-4712-842F-E8B06F6A579C}"
+	ProjectSection(SolutionItems) = preProject
+		Octothorp.Gateway\Dockerfile-Linux = Octothorp.Gateway\Dockerfile-Linux
+		Octothorp.Gateway\Dockerfile-LinuxArm32 = Octothorp.Gateway\Dockerfile-LinuxArm32
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{717BBF9C-E594-48CA-BCFE-B2D1540A7255}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\release-tag.yml = .github\workflows\release-tag.yml
+		.github\workflows\release.yml = .github\workflows\release.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +37,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{717BBF9C-E594-48CA-BCFE-B2D1540A7255} = {299A025E-0B26-4712-842F-E8B06F6A579C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BACA199D-6A4F-41ED-98B4-5CEC462CC496}
