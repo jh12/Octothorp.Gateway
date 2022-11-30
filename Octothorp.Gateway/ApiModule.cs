@@ -6,8 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Octothorp.Gateway.Middleware;
 using Serilog;
 using Serilog.Core;
-using Serilog.Sinks.Loki;
-using Serilog.Sinks.Loki.Labels;
+using Serilog.Formatting.Compact;
 
 namespace Octothorp.Gateway
 {
@@ -45,18 +44,11 @@ namespace Octothorp.Gateway
 
             if (_hostEnvironment.IsProduction())
             {
-                IConfigurationSection lokiSection = _configuration.GetSection("Loki");
-
-                if (lokiSection != null)
-                {
-                    string url = lokiSection["Url"];
-
-                    builder.WriteTo.LokiHttp(() => new LokiSinkConfiguration()
-                    {
-                        LokiUrl = url,
-                        LogLabelProvider = new LokiLabelProvider()
-                    });
-                }
+                builder.WriteTo.Console(new RenderedCompactJsonFormatter());
+            }
+            else
+            {
+                builder.WriteTo.Console();
             }
 
             Logger logger = builder.CreateLogger();
@@ -69,14 +61,5 @@ namespace Octothorp.Gateway
         {
             builder.RegisterType<LoggingContextMiddleware>();
         }
-    }
-
-    public class LokiLabelProvider : ILogLabelProvider
-    {
-        public IList<LokiLabel> GetLabels() => new List<LokiLabel>();
-
-        public IList<string> PropertiesAsLabels => new List<string> { "AssemblyName", "level", "Path" };
-        public IList<string> PropertiesToAppend => new List<string>();
-        public LokiFormatterStrategy FormatterStrategy => LokiFormatterStrategy.SpecificPropertiesAsLabelsAndRestAppended;
     }
 }
