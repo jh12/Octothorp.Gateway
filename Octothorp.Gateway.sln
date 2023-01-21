@@ -10,7 +10,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{299A025E-0B26-4712-842F-E8B06F6A579C}"
 	ProjectSection(SolutionItems) = preProject
 		Octothorp.Gateway\Dockerfile-Linux = Octothorp.Gateway\Dockerfile-Linux
-		Octothorp.Gateway\Dockerfile-LinuxArm32 = Octothorp.Gateway\Dockerfile-LinuxArm32
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{717BBF9C-E594-48CA-BCFE-B2D1540A7255}"
