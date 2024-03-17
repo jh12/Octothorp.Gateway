@@ -1,58 +1,105 @@
-﻿using System;
-using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Octothorp.Gateway.Auth.Cookie;
+using Octothorp.Gateway.Authorization.Handlers;
+using Octothorp.Gateway.Authorization.Requirements;
+using Octothorp.Gateway.Middleware;
 using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Compact;
 
-namespace Octothorp.Gateway
-{
-    public class Program
+var builder = WebApplication.CreateBuilder(args);
+
+SetupLogger(builder);
+
+builder.Host.UseSerilog();
+
+
+IServiceCollection services = builder.Services;
+
+services.AddSerilog(Log.Logger);
+services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+services.AddScoped<LoggingContextMiddleware>();
+
+services.AddControllers();
+services.AddHttpContextAccessor();
+
+services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(c =>
     {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+        c.Events = new OctoCookieAuthenticationEvents();
+    });
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            IConfiguration config = CreateConfig();
+services.AddAuthorization(options =>
+{
+    options.AddPolicy("LocalMachine", policy => policy.Requirements.Add(new ZoneRequirement(ZoneRequirement.ZoneArea.LocalMachine)));
+    options.AddPolicy("LocalNetwork", policy => policy.Requirements.Add(new ZoneRequirement(ZoneRequirement.ZoneArea.LocalNetwork)));
+    options.AddPolicy("External", policy => policy.Requirements.Add(new ZoneRequirement(ZoneRequirement.ZoneArea.External)));
+});
 
-            IHostBuilder hostBuilder = Host.CreateDefaultBuilder(args)
-                .UseSerilog()
-                .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-                .ConfigureAppConfiguration((context, builder) =>
-                {
-                    builder.AddConfiguration(config);
-                })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder
-                        .UseStartup<Startup>()
-                        .UseKestrel(options =>
-                        {
-                            options.Limits.MaxRequestBodySize = null;
-                        });
-                });
+services.AddSingleton<IAuthorizationHandler, ZoneHandler>();
 
-            return hostBuilder;
-        }
+services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.All;
+});
 
-        private static IConfiguration CreateConfig()
-        {
-            string? contentRootPath = Environment.GetEnvironmentVariable("contentroot");
+var app = builder.Build();
 
-            ConfigurationBuilder builder = new ConfigurationBuilder();
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+    ForwardLimit = 2
+});
 
-            if (!string.IsNullOrEmpty(contentRootPath))
-                builder.SetBasePath(contentRootPath);
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseHttpsRedirection();
+}
 
-            builder
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile("lettuceencrypt.json", optional: true, reloadOnChange: true)
-                .AddJsonFile("proxy.json", optional: true, reloadOnChange: true);
+app.UseStatusCodePages();
 
-            return builder.Build();
-        }
+app.UseLoggingContext();
+app.UseSerilogRequestLogging();
+
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapReverseProxy();
+app.MapControllers();
+
+app.Run();
+
+static void SetupLogger(WebApplicationBuilder webApplicationBuilder)
+{
+    LoggerConfiguration loggerConfiguration = new LoggerConfiguration();
+
+    if (webApplicationBuilder.Environment.IsDevelopment())
+    {
+        loggerConfiguration.WriteTo.Console();
     }
+    else
+    {
+        loggerConfiguration.WriteTo.Console(new CompactJsonFormatter());
+    }
+
+    loggerConfiguration.ReadFrom.Configuration(webApplicationBuilder.Configuration);
+
+    loggerConfiguration
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+        .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+        .Enrich.FromLogContext();
+
+    Log.Logger = loggerConfiguration.CreateLogger();
 }

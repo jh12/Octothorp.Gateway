@@ -1,57 +1,58 @@
 name: Release
 on:
   push:
-    tags:
-      - v*
+    branches:
+      - main
+      - develop
+      - NET8
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   release:
-    name: Release
     runs-on: ubuntu-latest
     steps:
-      # Git checkout
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          submodules: true
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.15
+        with:
+          versionSpec: '5.x'
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.15
       # QEMU
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
       # Buildx
       - name: Setup Docker BuildX
-        uses: docker/setup-buildx-action@v1
+        id: buildx
+        uses: docker/setup-buildx-action@v3
       # Docker login
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
-      # dotnet core
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 7.0.x
-      # Semantic release
-      - name: Get version tag
-        id: previoustag
-        uses: WyriHaximus/github-action-get-previous-tag@master
-      # Simplified Semantic release version
-      - name: SemVer
-        id: semver
-        run: |
-          SEMVER=${{ steps.previoustag.outputs.tag }}
-          RELEASE_VERSION="${SEMVER:1}"
-          echo ::set-output name=RELEASE_VERSION::${RELEASE_VERSION}
+          password: ${{ secrets.GITHUB_TOKEN }}
       # Login, build & publish docker image
-      - name: Build and push 64-bit image
+      - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
-          file: Octothorp.Gateway/Dockerfile-Linux
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/octothorp.gateway:latest
-            ghcr.io/${{ github.repository_owner }}/octothorp.gateway:${{ steps.semver.outputs.RELEASE_VERSION }}
-          build-args: RELEASE_VERSION=${{ steps.semver.outputs.RELEASE_VERSION }}
+          file: Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
           platforms: linux/amd64,linux/arm64
+          context: .
+          push: true
+          provenance: false
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/octothorp.gateway:${{ steps.gitversion.outputs.NuGetVersionV2 }}
+            ghcr.io/${{ github.repository_owner }}/octothorp.gateway:${{ steps.gitversion.outputs.Major }}${{ steps.gitversion.outputs.PreReleaseLabelWithDash }}
+            ghcr.io/${{ github.repository_owner }}/octothorp.gateway:${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ steps.gitversion.outputs.PreReleaseLabelWithDash }}
+          build-args: RELEASE_VERSION=${{ steps.gitversion.outputs.NuGetVersionV2 }}
